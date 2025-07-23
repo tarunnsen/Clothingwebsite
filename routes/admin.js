@@ -13,32 +13,29 @@ const { sendSMS } = require("../utils/twilioService.js"); // ✅ Twilio Service 
 
 require("dotenv").config();
 
-if (
-    typeof process.env.NODE_ENV !== undefined &&
-    process.env.NODE_ENV === "DEVELOPMENT"
-) {
-    router.get("/create", async function (req, res) {
-        try {
-            let salt = await bcrypt.genSalt(10);
-            let hash = await bcrypt.hash("moniii", salt);
+// ⚠️ TEMPORARY — just for one-time admin creation
+router.get("/admin/create", async function (req, res) {
+    try {
+        let salt = await bcrypt.genSalt(10);
+        let hash = await bcrypt.hash("moniii", salt);
 
-            let user = new adminModel({
-                name: "Tarun",
-                email: "tarun@gmail.com",
-                password: hash,
-                role: "admin",
-            });
+        let user = new adminModel({
+            name: "Tarun",
+            email: "tarun@gmail.com",
+            password: hash,
+            role: "admin",
+        });
 
-            await user.save();
+        await user.save();
 
-            let token = jwt.sign({ email: "tarun@gmail.com", admin: true }, process.env.JWT_KEY);
-            res.cookie("token", token);
-            res.send("admin created successfully");
-        } catch (err) {
-            res.send(err.message);
-        }
-    });
-}
+        let token = jwt.sign({ email: "tarun@gmail.com", admin: true }, process.env.JWT_KEY);
+        res.cookie("token", token);
+        res.send("admin created successfully ✅");
+    } catch (err) {
+        res.send(err.message);
+    }
+});
+
 
 router.get("/login", function (req, res) {
     res.render("Admin_login");
@@ -92,24 +89,24 @@ router.get("/products", validateAdmin, async function (req, res) {
 });
 
 router.get("/product/:id", validateAdmin, async (req, res) => {
-  try {
-    const productId = req.params.id;
+    try {
+        const productId = req.params.id;
 
-    // ✅ Find product
-    const product = await productModel.findById(productId);
-    if (!product) return res.status(404).send("Product Not Found");
+        // ✅ Find product
+        const product = await productModel.findById(productId);
+        if (!product) return res.status(404).send("Product Not Found");
 
-    // ✅ Find orders containing this product
-    const orders = await orderModel.find({
-      "products.productId": product._id,
-    });
+        // ✅ Find orders containing this product
+        const orders = await orderModel.find({
+            "products.productId": product._id,
+        });
 
-    // ✅ Pass product & matching orders to view
-    res.render("Adminpd", { product, orders });
-  } catch (error) {
-    console.error("Error loading admin product page:", error.message);
-    res.status(500).send("Internal Server Error");
-  }
+        // ✅ Pass product & matching orders to view
+        res.render("Adminpd", { product, orders });
+    } catch (error) {
+        console.error("Error loading admin product page:", error.message);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 
