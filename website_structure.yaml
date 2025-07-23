@@ -1,0 +1,136 @@
+Website Modles :-
+
+1 User
+2 Product
+3 Category
+4 Cart
+5 Order
+6 Payment
+7 Review/Rating
+8 Wishlist
+9 Admin (Optional)
+10 Address
+
+.......................................................................................
+
+1. User Model
+
+Purpose: Users ka data store karega (signup/sign-in ke liye)
+Fields:
+Name
+Email (unique)
+Password (hashed)
+Google ID (agar "Continue with Google" option ho)
+Phone Number
+Address (delivery ke liye)
+Role (admin/user)
+
+======================================================================================
+
+2. Product Model
+
+Purpose: Website par available products ka data store karega
+Fields:
+Product Name
+Product Description
+Price
+Discount/Offer
+Category (e.g., Men, Women, Kids)
+Subcategory (e.g., T-shirts, Jeans, etc.)
+Images (URLs for product photos)
+Sizes (S, M, L, XL, etc.)
+Stock Quantity
+Ratings/Reviews
+
+=======================================================================================
+
+3. Category Model
+
+Purpose: Product categories aur subcategories ko manage karega
+Fields:
+Category Name (e.g., Men, Women, Kids)
+Subcategories (e.g., T-Shirts, Jeans)
+
+=======================================================================================
+
+4. Cart Model
+
+Purpose: Users ke cart ka data store karega
+Fields:
+User ID (kis user ka cart hai)
+Product ID (cart mein kaunse product hain)
+Quantity (kitna order kiya gaya hai)
+Total Price
+
+========================================================================================
+
+5. Order Model
+
+Purpose: Users ke orders ko track karega
+Fields:
+Order ID
+User ID
+Product IDs (jo products order kiye gaye hain)
+Quantity for each product
+Order Status (Pending, Shipped, Delivered)
+Payment Method (Credit Card, Google Pay, etc.)
+Total Amount
+Delivery Address
+
+========================================================================================
+
+6. Payment Model
+
+Purpose: Payments ka record rakhna
+Fields:
+Payment ID
+User ID
+Order ID
+Amount
+Payment Method
+Payment Status (Success/Failed)
+
+=======================================================================================
+
+7. Review/Rating Model
+
+Purpose: Products ke reviews aur ratings manage karega
+Fields:
+Product ID
+User ID
+Rating (out of 5)
+Review Text
+Timestamp
+
+========================================================================================
+
+8. Wishlist Model
+
+Purpose: Users ki wishlist manage karega
+Fields:
+User ID
+Product IDs (wishlist mein jo items hain)
+
+=========================================================================================
+
+9. Admin Model (Optional)
+
+Purpose: Admins ka data store karega jo products aur orders ko manage karenge
+Fields:
+Admin Name
+Admin Email
+Admin Password (hashed)
+
+==========================================================================================
+
+10. Address Model
+
+Purpose: Users ke multiple delivery addresses store karega
+Fields:
+User ID
+Address Line 1
+Address Line 2
+City
+State
+Postal Code
+Country

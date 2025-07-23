@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- ✅ Responsive NAVBAR -->
+  <header class="bg-black shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold text-white">The Paddler Admin Panel</h1>
+
+      <!-- Hamburger Menu Button -->
+      <button id="menuBtn" class="text-white sm:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden sm:flex space-x-6 text-white" id="navLinks">
+        <a href="/admin/dashboard" class="hover:underline">Dashboard</a>
+        <a href="/admin/products" class="hover:underline">Products</a>
+        <a href="/admin/orders" class="hover:underline font-semibold underline">Orders</a>
+        <a href="/admin/logout" class="hover:underline">Logout</a>
+      </nav>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="sm:hidden hidden px-4 pb-4">
+      <a href="/admin/dashboard" class="block text-white py-1">Dashboard</a>
+      <a href="/admin/products" class="block text-white py-1">Products</a>
+      <a href="/admin/orders" class="block text-white py-1 font-semibold underline">Orders</a>
+      <a href="/admin/logout" class="block text-white py-1">Logout</a>
+    </div>
+  </header>
+
+  <!-- ✅ Main Content -->
+  <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow mt-6">
+    <h2 class="text-2xl font-bold text-center mb-6">Admin Panel - Orders</h2>
+
+    <!-- ✅ Search & Filter -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+      <input type="text" id="searchInput" placeholder="🔍 Search Orders..."
+        onkeyup="searchOrders()" class="p-2 border rounded w-full md:w-1/3">
+      <select id="statusFilter" onchange="filterOrders()" class="p-2 border rounded w-full md:w-auto">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="processing">Processing</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <!-- ✅ Orders Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full table-auto border-collapse border text-sm">
+        <thead class="bg-black text-white">
+          <tr>
+            <th class="border p-2">Order ID</th>
+            <th class="border p-2">Customer</th>
+            <th class="border p-2">Email</th>
+            <th class="border p-2">Phone</th>
+            <th class="border p-2">Address</th>
+            <th class="border p-2">Products</th>
+            <th class="border p-2">Amount</th>
+            <th class="border p-2">Invoice</th>
+            <th class="border p-2">Status</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTable">
+          <% orders.forEach(order => { %>
+            <tr class="order-row" data-status="<%= order.status %>">
+              <td class="border p-2"><%= order.orderId %></td>
+              <td class="border p-2"><%= order.customerName %></td>
+              <td class="border p-2"><%= order.email %></td>
+              <td class="border p-2"><%= order.phone %></td>
+              <td class="border p-2">
+                <%= order.address.street %>, <%= order.address.city %>, <%= order.address.state %> - <%= order.address.zip %>
+              </td>
+              <td class="border p-2">
+                <% order.products.forEach(product => { %>
+                  <div class="mb-1">
+                    <b>Name:</b> <a href="/admin/product/<%= product.productId %>" class="text-blue-500 hover:underline">
+                      <%= product.name %>
+                    </a> |
+                    <b>Price:</b> ₹<%= product.price %> |
+                    <b>Qty:</b> <%= product.quantity %>
+                  </div>
+                <% }) %>
+              </td>
+              <td class="border p-2">₹<%= order.amount %></td>
+              <td class="border p-2 text-center">
+                <a href="/payment/download-invoice/<%= order.orderId %>" target="_blank" class="text-blue-600 underline">Download</a>
+              </td>
+              <td class="border p-2">
+                <form class="updateOrderForm flex gap-2 items-center">
+                  <input type="hidden" class="orderId" value="<%= order.orderId %>">
+                  <select class="orderStatus p-1 border rounded">
+                    <option value="pending" <%= order.status==='pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="processing" <%= order.status==='processing' ? 'selected' : '' %>>Processing</option>
+                    <option value="shipped" <%= order.status==='shipped' ? 'selected' : '' %>>Shipped</option>
+                    <option value="delivered" <%= order.status==='delivered' ? 'selected' : '' %>>Delivered</option>
+                    <option value="cancelled" <%= order.status==='cancelled' ? 'selected' : '' %>>Cancelled</option>
+                  </select>
+                  <button type="submit" class="bg-black text-white px-2 py-1 rounded">Update</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ✅ Pagination -->
+    <div class="flex justify-between mt-6 text-sm">
+      <button id="prevPage" onclick="changePage(-1)" class="bg-gray-200 px-3 py-1 rounded">⬅️ Previous</button>
+      <span id="pageNumber">Page 1</span>
+      <button id="nextPage" onclick="changePage(1)" class="bg-gray-200 px-3 py-1 rounded">Next ➡️</button>
+    </div>
+  </div>
+
+  <!-- ✅ Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // Responsive Nav Toggle
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    });
+
+    // Update Order
+    document.querySelectorAll(".updateOrderForm").forEach(form => {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const orderId = this.querySelector(".orderId").value;
+        const status = this.querySelector(".orderStatus").value;
+        axios.post("/admin/update-order", { orderId, status })
+          .then(res => {
+            alert(res.data.message);
+            location.reload();
+          }).catch(err => {
+            alert("❌ Error updating order!");
+            console.error(err.response?.data || err.message);
+          });
+      });
+    });
+
+    // Search Orders
+    function searchOrders() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      document.querySelectorAll(".order-row").forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(input) ? "" : "none";
+      });
+    }
+
+    // Filter Orders
+    function filterOrders() {
+      const status = document.getElementById("statusFilter").value;
+      document.querySelectorAll(".order-row").forEach(row => {
+        row.style.display = (!status || row.dataset.status === status) ? "" : "none";
+      });
+    }
+
+    // Pagination
+    let currentPage = 1, rowsPerPage = 10;
+    function changePage(step) {
+      const rows = document.querySelectorAll(".order-row");
+      const totalPages = Math.ceil(rows.length / rowsPerPage);
+      currentPage = Math.max(1, Math.min(currentPage + step, totalPages));
+      rows.forEach((row, i) => {
+        row.style.display = (i >= (currentPage - 1) * rowsPerPage && i < currentPage * rowsPerPage) ? "" : "none";
+      });
+      document.getElementById("pageNumber").textContent = `Page ${currentPage}`;
+    }
+    changePage(0);
+  </script>
+</body>
+
+</html>

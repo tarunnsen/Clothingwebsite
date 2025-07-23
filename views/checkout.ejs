@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
+        <h2 class="text-2xl font-semibold mb-4 text-center">Checkout</h2>
+
+        <form id="checkoutForm">
+            <!-- ✅ User Details -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium">Name</label>
+                    <input type="text" id="name" value="<%= user.name %>" readonly
+                        class="border p-2 w-full bg-gray-200 rounded" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium">Email</label>
+                    <input type="email" id="email" value="<%= user.email %>" readonly
+                        class="border p-2 w-full bg-gray-200 rounded" />
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <label class="block text-sm font-medium">Phone Number</label>
+                <input type="text" id="phone" placeholder="Enter Phone Number" required
+                    class="border p-2 w-full rounded" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number" />
+            </div>
+
+            <!-- ✅ Address Fields -->
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium">Street Address</label>
+                    <input type="text" id="street" placeholder="House No, Street Name" required
+                        class="border p-2 w-full rounded" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium">City</label>
+                    <input type="text" id="city" placeholder="City Name" required class="border p-2 w-full rounded" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium">State</label>
+                    <input type="text" id="state" placeholder="State Name" required class="border p-2 w-full rounded" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium">ZIP Code</label>
+                    <input type="text" id="zip" placeholder="ZIP Code" required class="border p-2 w-full rounded"
+                        pattern="[0-9]{6}" title="Enter a valid 6-digit ZIP Code" />
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium">Country</label>
+                    <input type="text" id="country" placeholder="Country" required class="border p-2 w-full rounded" />
+                </div>
+            </div>
+
+            <!-- ✅ Cart Products Summary -->
+            <div class="mt-6 bg-gray-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2">Your Cart</h3>
+                <div class="space-y-2">
+                    <% cart.products.forEach(item=> { %>
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <div>
+                                <p class="font-medium">
+                                    <%= item.productId.name %>
+                                </p>
+                                <p class="text-gray-500 text-sm">Qty: <%= item.quantity %> | ₹<%= item.productId.price
+                                            %>
+                                </p>
+                            </div>
+                            <p class="font-semibold">₹<%= item.productId.price * item.quantity %>
+                            </p>
+                        </div>
+                        <% }); %>
+                </div>
+
+                <div class="mt-4 flex justify-between font-semibold">
+                    <span>Total:</span>
+                    <span>₹<%= cart.products.reduce((sum, item)=> sum + (item.productId.price * item.quantity), 0)
+                            %></span>
+                </div>
+            </div>
+
+            <!-- ✅ Proceed to Payment Button -->
+            <button type="submit" class="mt-6 w-full bg-blue-500 text-white p-3 rounded-lg font-semibold">
+                Proceed to Payment
+            </button>
+        </form>
+    </div>
+
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // ✅ Fetch User Details
+        axios.get('/payment/user/details')
+            .then(response => {
+                if (response.data.name) {
+                    document.getElementById("name").value = response.data.name;
+                }
+                if (response.data.email) {
+                    document.getElementById("email").value = response.data.email;
+                }
+            })
+            .catch(error => {
+                console.error("User not logged in:", error);
+                localStorage.setItem("redirectAfterLogin", window.location.href);
+                window.location.href = "/users/signin";
+            });
+
+        // ✅ Payment Form Submit Event
+        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // ✅ Disable Pay Button
+            const payButton = document.querySelector("button[type='submit']");
+            payButton.disabled = true;
+            payButton.innerText = "Processing...";
+
+            // ✅ User Input Values
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const street = document.getElementById("street").value;
+            const city = document.getElementById("city").value;
+            const state = document.getElementById("state").value;
+            const zip = document.getElementById("zip").value;
+            const country = document.getElementById("country").value;
+
+            if (!phone || !street || !city || !state || !zip || !country) {
+                alert("Please fill all address fields!");
+                payButton.disabled = false;
+                payButton.innerText = "Proceed to Payment";
+                return;
+            }
+
+            // ✅ Check if Single Product or Cart Checkout
+            const isSingleProduct = document.getElementById("productId") !== null;
+
+            let orderData;
+
+            if (isSingleProduct) {
+                // ✅ **Single Product Checkout**
+                const productId = document.getElementById("productId").value;
+                const productName = document.getElementById("productName").value;
+                const productPrice = parseFloat(document.getElementById("productPrice").value);
+                const productQuantity = 1;
+
+                orderData = {
+                    name, email, phone,
+                    address: { street, city, state, zip, country },
+                    products: [{ productId, name: productName, quantity: productQuantity, price: productPrice }],
+                    totalAmount: productPrice // ✅ Single Product Price
+                };
+                console.log("📦 Address Debug:", { street, city, state, zip, country });
+                console.log("🟢 Sending Order Details:", orderData);
+
+            } else {
+                // ✅ **Cart Checkout**
+                let cartTotal = <%= cart.products.reduce((sum, item) => sum + (item.productId.price * item.quantity), 0) %>;
+
+                if (cartTotal <= 0) {
+                    alert("Cart total must be greater than 0!");
+                    payButton.disabled = false;
+                    payButton.innerText = "Proceed to Payment";
+                    return;
+                }
+
+                const products = [];
+                <% cart.products.forEach(item => { %>
+                    products.push({
+                        productId: "<%= item.productId._id %>",
+                        name: "<%= item.productId.name %>",
+                        quantity: <%= item.quantity %>,
+                        price: <%= item.productId.price %>
+                    });
+                <% }); %>
+
+                    orderData = {
+                    name, email, phone,
+                        address: { street, city, state, zip, country },
+                    products: products,
+                        totalAmount: cartTotal // ✅ Cart Total Amount
+                };
+            }
+
+            console.log("🟢 Sending Order Details:", orderData);
+
+            // ✅ Send Order Creation Request
+            axios.post('/payment/create/orderId', orderData)
+                .then(function (response) {
+                    console.log("✅ Order Created Successfully:", response.data);
+
+                    var options = {
+                        "key": "rzp_test_sGIEiXT78mGZgu",
+                        "amount": response.data.amount, // ✅ Server से सही Amount आएगा
+                        "currency": "INR",
+                        "name": "TechFocus",
+                        "description": "Test Transaction",
+                        "order_id": response.data.orderId,
+                        "handler": function (paymentResponse) {
+                            axios.post('/payment/api/payment/verify', {
+                                razorpayOrderId: paymentResponse.razorpay_order_id,
+                                razorpayPaymentId: paymentResponse.razorpay_payment_id,
+                                signature: paymentResponse.razorpay_signature
+                            })
+                                .then(function (verifyResponse) {
+                                    window.location.href = verifyResponse.data.redirectUrl;
+                                })
+                                .catch(function () {
+                                    alert("Payment verification failed!");
+                                    payButton.disabled = false;
+                                    payButton.innerText = "Proceed to Payment";
+                                });
+                        },
+                        "prefill": { "name": name, "email": email, "contact": phone },
+                        "theme": { "color": "#3399cc" }
+                    };
+
+                    new Razorpay(options).open();
+                })
+                .catch(() => alert("Failed to initiate payment. Try again!"));
+        });
+    </script>
+</body>
+
+</html>

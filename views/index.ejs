@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothing Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-white">
+
+    <!-- Navigation -->
+    <div class="relative flex size-full min-h-screen flex-col bg-[#f8f9fc] group/design-root overflow-x-hidden"
+        style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
+        <div class="layout-container flex h-full grow flex-col">
+
+            <!-- Header -->
+            <header class="flex items-center justify-between border-b px-10 py-3">
+                <div class="flex items-center gap-4 text-[#0e121b]">
+                    <div class="size-4">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-bold">TechFocus</h2>
+                </div>
+                <div class="flex flex-1 justify-end gap-8 items-center">
+                    <div class="hidden md:flex items-center gap-9">
+                        <a href="#" class="text-sm font-medium">Women</a>
+                        <a href="#" class="text-sm font-medium">Men</a>
+                        <a href="#" class="text-sm font-medium">Home</a>
+                        <a href="#" class="text-sm font-medium">Beauty</a>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="/users/signin"
+                            class="h-10 px-4 rounded-xl bg-[#e7ebf3] text-sm font-bold flex items-center">
+                            Sign in
+                        </a>
+                        <button class="h-10 px-2.5 rounded-xl bg-[#e7ebf3] text-sm font-bold flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor"
+                                viewBox="0 0 256 256">
+                                <path
+                                    d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Hamburger Menu -->
+                <div class="md:hidden">
+                    <button id="hamburger" class="text-gray-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center bg-white border-b">
+                <a href="#" class="text-sm font-medium py-2">Women</a>
+                <a href="#" class="text-sm font-medium py-2">Men</a>
+                <a href="#" class="text-sm font-medium py-2">Home</a>
+                <a href="#" class="text-sm font-medium py-2">Beauty</a>
+            </div>
+
+            <!-- Banner Section -->
+            <div class="px-40 flex flex-1 justify-center py-5">
+                <div class="max-w-[960px] w-full">
+                    <div id="banner"
+                        class="banner min-h-[480px] bg-cover bg-center bg-no-repeat rounded-xl px-4 pb-10 flex flex-col justify-end items-start gap-6"
+                        style="background-image: url('<%= bannerProduct?.images?.[0] || " /images/default.jpg" %>')">
+                        <div class="text-left text-white">
+                            <h1 class="text-4xl font-black">
+                                <%= bannerProduct.name %>
+                            </h1>
+                            <h2 class="text-sm font-normal">
+                                <%= bannerProduct.description %>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const banner = document.getElementById("banner");
+                const originalImage = "<%= bannerProduct?.images?.[0] || '/images/default.jpg' %>";
+                const hoverImage = "<%= alternateBannerProduct?.images?.[0] || '/images/default.jpg' %>";
+
+                banner.addEventListener("mouseover", () => {
+                    banner.style.backgroundImage = `url('${hoverImage}')`;
+                });
+
+                banner.addEventListener("mouseout", () => {
+                    banner.style.backgroundImage = `url('${originalImage}')`;
+                });
+
+                // Hamburger menu functionality
+                const hamburger = document.getElementById("hamburger");
+                const mobileMenu = document.getElementById("mobile-menu");
+
+                hamburger.addEventListener("click", () => {
+                    mobileMenu.classList.toggle("hidden");
+                });
+            </script>
+
+            <!-- Featured Categories -->
+            <section class="py-4 bg-gray-50">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-6">Featured Categories</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <% featuredCategories.forEach(category=> { %>
+                            <% let catImage=category.products?.[0]?.images?.[0] || '/images/default.jpg' ; %>
+                                <a href="/category/<%= category._id._id %>"
+                                    class="relative group overflow-hidden rounded-lg">
+                                    <img src="<%= catImage %>" alt="<%= category._id.name %> Collection"
+                                        class="w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-300">
+                                    <div
+                                        class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <h3 class="text-white text-2xl font-bold">
+                                            <%= category._id.name %> Collection
+                                        </h3>
+                                    </div>
+                                </a>
+                                <% }); %>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Arrivals -->
+            <section class="py-12">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">New Arrivals</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <% newArrivals.forEach(product=> { %>
+                            <div class="group">
+                                <a href="/product/<%= product._id %>">
+                                    <div class="relative overflow-hidden rounded-lg mb-4">
+                                        <img src="<%= product.images?.[0] || '/images/default.jpg' %>" alt="Product"
+                                            class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-300">
+                                        <button
+                                            class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            Quick View
+                                        </button>
+                                    </div>
+                                    <h3 class="text-lg font-semibold mb-2">
+                                        <%= product.name %>
+                                    </h3>
+                                    <p class="text-gray-600">$<%= product.price %>
+                                    </p>
+                                </a>
+                            </div>
+                            <% }); %>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-gray-900 text-white py-12">
+                <div class="container mx-auto px-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold mb-4">TechFocus</h4>
+                            <p class="text-gray-400">Premium clothing for the modern individual.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-4">Quick Links</h4>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-gray-400 hover:text-white">Men's Collection</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white">Women's Collection</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white">Sale</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-4">Customer Service</h4>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white">Shipping Policy</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white">Returns</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-4">Newsletter</h4>
+                            <p class="text-gray-400">Subscribe for updates and exclusive deals.</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                        <p>&copy; 2025 TechFocus. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

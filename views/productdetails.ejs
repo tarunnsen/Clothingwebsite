@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= product.name %> - TechFocus
+  </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body class="bg-white relative">
+  <div class="flex min-h-screen flex-col bg-[#f8f9fc]">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between px-6 md:px-10 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-bold text-[#0e121b]">TechFocus</h2>
+
+      <!-- Hamburger Icon -->
+      <button id="hamburger" class="md:hidden focus:outline-none">
+        <svg class="w-6 h-6 text-[#0e121b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Desktop Menu -->
+      <nav class="hidden md:flex space-x-6" id="desktop-nav">
+        <a href="#" class="text-sm font-medium text-[#0e121b]">Women</a>
+        <a href="#" class="text-sm font-medium text-[#0e121b]">Men</a>
+        <a href="/" class="text-sm font-medium text-[#0e121b]">Home</a>
+        <a href="#" class="text-sm font-medium text-[#0e121b]">Beauty</a>
+      </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="hidden md:hidden flex flex-col space-y-2 px-6 py-2 bg-white border-b">
+      <a href="#" class="text-sm font-medium text-[#0e121b]">Women</a>
+      <a href="#" class="text-sm font-medium text-[#0e121b]">Men</a>
+      <a href="/" class="text-sm font-medium text-[#0e121b]">Home</a>
+      <a href="#" class="text-sm font-medium text-[#0e121b]">Beauty</a>
+    </nav>
+
+    <!-- Product Section -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Product Image Gallery -->
+      <div class="flex flex-col items-center">
+        <% let mainImage=product.images && product.images.length> 0 ? product.images[0] : '/images/default.jpg'; %>
+          <img id="mainImage" src="<%= mainImage %>" alt="<%= product.name %>"
+            class="w-full max-w-[370px] h-[500px] rounded-lg shadow-lg mb-4">
+
+          <!-- Thumbnails -->
+          <div class="flex space-x-2 mt-2 flex-wrap justify-center">
+            <% if (product.images && product.images.length> 1) {
+              product.images.forEach((img) => { %>
+              <img src="<%= img %>"
+                class="w-20 h-20 object-cover rounded-md border cursor-pointer hover:scale-105 transition-transform duration-200 thumbnail"
+                onclick="document.getElementById('mainImage').src = this.src;" />
+              <% }) } %>
+          </div>
+      </div>
+
+      <!-- Product Details -->
+      <div class="flex flex-col space-y-6">
+        <h1 class="text-3xl font-bold">
+          <%= product.name %>
+        </h1>
+
+        <% if (product.description) { %>
+          <p class="text-gray-600">
+            <%= product.description %>
+          </p>
+          <% } %>
+
+            <% if (product.discountPrice) { %>
+              <p class="text-gray-500 line-through">₹<%= product.price %>
+              </p>
+              <p class="text-xl font-semibold text-green-600">₹<%= product.discountPrice %> <span
+                    class="text-sm text-gray-500">(Discounted)</span></p>
+              <% } else { %>
+                <p class="text-xl font-semibold text-gray-900">₹<%= product.price %>
+                </p>
+                <% } %>
+
+                  <% if (product.material) { %>
+                    <p class="text-sm text-gray-600">Material: <%= product.material %>
+                    </p>
+                    <% } %>
+
+                      <!-- Size Selection -->
+                      <% if (product.sizes && product.sizes.length> 0) { %>
+                        <div>
+                          <h3 class="text-sm font-medium text-gray-700">Size</h3>
+                          <div class="flex space-x-2 mt-2 flex-wrap">
+                            <% product.sizes.forEach(size=> { %>
+                              <button class="border px-4 py-2 rounded-md">
+                                <%= size %>
+                              </button>
+                              <% }) %>
+                          </div>
+                        </div>
+                        <% } %>
+
+                          <!-- Color Selection -->
+                          <% if (product.colors && product.colors.length> 0) { %>
+                            <div>
+                              <h3 class="text-sm font-medium text-gray-700">Color</h3>
+                              <div class="flex space-x-2 mt-2">
+                                <% product.colors.forEach(color=> {
+                                  let colorClass = "";
+                                  switch(color.toLowerCase()) {
+                                  case 'black': colorClass = 'bg-black'; break;
+                                  case 'red': colorClass = 'bg-red-500'; break;
+                                  case 'blue': colorClass = 'bg-blue-500'; break;
+                                  case 'green': colorClass = 'bg-green-500'; break;
+                                  case 'white': colorClass = 'bg-white border'; break;
+                                  default: colorClass = 'bg-gray-400'; break;
+                                  }
+                                  %>
+                                  <div class="w-8 h-8 rounded-full <%= colorClass %>"></div>
+                                  <% }) %>
+                              </div>
+                            </div>
+                            <% } %>
+
+                              <!-- Buttons -->
+                              <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                                <button onclick="addToCart('<%= product._id %>')"
+                                  class="px-6 py-3 bg-blue-600 text-white rounded-lg">Add to Cart</button>
+                                <button class="paybtn px-6 py-3 bg-gray-800 text-white rounded-lg"
+                                  data-product-id="<%= product._id %>">Buy Now</button>
+                              </div>
+      </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h2 class="text-2xl font-bold mb-6">Related Products</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <% relatedProducts.forEach(related=> { %>
+          <a href="/product/<%= related._id %>">
+            <div class="group bg-white shadow-md rounded-lg p-4 cursor-pointer hover:shadow-lg transition">
+              <div class="relative overflow-hidden rounded-lg mb-4">
+                <% let relatedImage=related.images && related.images.length> 0 ? related.images[0] :
+                  '/images/default.jpg'; %>
+                  <img src="<%= relatedImage %>" alt="<%= related.name %>"
+                    class="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300">
+              </div>
+              <h3 class="text-lg font-semibold">
+                <%= related.name %>
+              </h3>
+              <p class="text-gray-600">₹<%= related.discountPrice || related.price %>
+              </p>
+            </div>
+          </a>
+          <% }) %>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h4 class="text-xl font-bold mb-4">TechFocus</h4>
+            <p class="text-gray-400">Premium clothing for the modern individual.</p>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-4">Quick Links</h4>
+            <ul class="space-y-2">
+              <li><a href="mens.html" class="text-gray-400 hover:text-white">Men's Collection</a></li>
+              <li><a href="womens.html" class="text-gray-400 hover:text-white">Women's Collection</a></li>
+              <li><a href="shop.html" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-white">Sale</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-4">Customer Service</h4>
+            <ul class="space-y-2">
+              <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-white">Shipping Policy</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-white">Returns & Exchanges</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-4">Newsletter</h4>
+            <p class="text-gray-400 mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
+          </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p>&copy; 2025 TechFocus. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 🛒 Slide-in Cart Drawer -->
+  <div id="cartDrawer"
+    class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50 overflow-y-auto">
+  </div>
+
+  <!-- Scripts -->
+  <script>
+   
+    // Buy Now
+    document.querySelectorAll('.paybtn').forEach(button => {
+      button.onclick = function () {
+        const productId = this.getAttribute("data-product-id");
+        window.location.href = `/payment/checkout/${productId}`;
+      };
+    });
+
+    // Add to cart
+    async function addToCart(productId) {
+      try {
+        const res = await fetch(`/cart/add/${productId}?ajax=true`);
+        if (res.ok) {
+          const html = await res.text();
+          document.getElementById("cartDrawer").innerHTML = html;
+          document.getElementById("cartDrawer").classList.remove("translate-x-full");
+        } else {
+          alert("Login first or try again.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong.");
+      }
+    }
+
+    // Handle cart updates: +, -, Remove
+    async function reloadCartDrawer() {
+      const res = await fetch("/cart?ajax=true");
+      const html = await res.text();
+      document.getElementById("cartDrawer").innerHTML = html;
+    }
+
+    document.addEventListener("click", async function (e) {
+      const btn = e.target.closest(".cart-increase, .cart-decrease, .cart-remove");
+      if (!btn) return;
+      e.preventDefault();
+      const href = btn.getAttribute("href");
+      try {
+        const res = await fetch(href);
+        if (res.ok) await reloadCartDrawer();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+  </script>
+  <script src="/script.js"></script>
+  
+</body>
+
+</html>

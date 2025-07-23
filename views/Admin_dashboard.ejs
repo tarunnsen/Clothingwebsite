@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Add Product - The Paddler's Admin Panel</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-black shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-xl font-bold text-white">The Paddler's Admin Panel</h1>
+
+                    <!-- Hamburger Button -->
+                    <button id="menuToggle" class="md:hidden text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+
+                    <!-- Desktop Nav -->
+                    <nav class="hidden md:flex items-center space-x-6">
+                        <a href="/admin/dashboard" class="text-white hover:underline">Dashboard</a>
+                        <a href="/admin/products" class="text-white hover:underline">Products</a>
+                        <a href="/admin/orders" class="text-white hover:underline">Orders</a>
+                        <a href="/admin/logout" class="text-white hover:underline">Logout</a>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-white">Admin User</span>
+                            <img class="h-8 w-8 rounded-full"
+                                src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin" />
+                        </div>
+                    </nav>
+                </div>
+
+                <!-- Mobile Menu -->
+                <div id="mobileMenu" class="md:hidden mt-4 hidden flex-col space-y-2">
+                    <a href="/admin/dashboard" class="text-white hover:underline block">Dashboard</a>
+                    <a href="/admin/products" class="text-white hover:underline block">Products</a>
+                    <a href="/admin/orders" class="text-white hover:underline block">Orders</a>
+                    <a href="/admin/logout" class="text-white hover:underline block">Logout</a>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <span class="text-white">Admin User</span>
+                        <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=random"
+                            alt="Admin" />
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8 flex justify-between items-center flex-wrap gap-4">
+                <h2 class="text-2xl font-bold text-gray-800">Add New T-Shirt Product</h2>
+                <a href="/"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md transition">
+                    Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Product Form -->
+            <form id="productForm" action="/product" method="POST" enctype="multipart/form-data"
+                class="bg-white shadow-md rounded-lg p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- Basic Product Information -->
+                        <section class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Basic Product Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+                                    <input type="text" name="productName" required
+                                        class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">SKU (Product Code)
+                                        *</label>
+                                    <input type="text" name="sku" required class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                                    <select name="category" required class="w-full px-3 py-2 border rounded-md">
+                                        <option value="">Select Category</option>
+                                        <option value="Men">Men</option>
+                                        <option value="Women">Women</option>
+                                        <option value="Beauty">Beauty</option>
+                                        <option value="Unisex">Unisex</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Pricing & Stock -->
+                        <section class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Pricing & Stock</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹) *</label>
+                                    <input type="number" name="price" required min="1"
+                                        class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Discount Price
+                                        (₹)</label>
+                                    <input type="number" name="discountPrice" min="0"
+                                        class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Stock Quantity *</label>
+                                    <input type="number" name="stockQuantity" required min="1"
+                                        class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Size & Color Options -->
+                        <section class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Size & Color Options</h3>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Available Sizes *</label>
+                                <div class="flex flex-wrap gap-4">
+                                    <label><input type="checkbox" name="sizes" value="S"> S</label>
+                                    <label><input type="checkbox" name="sizes" value="M"> M</label>
+                                    <label><input type="checkbox" name="sizes" value="L"> L</label>
+                                    <label><input type="checkbox" name="sizes" value="XL"> XL</label>
+                                    <label><input type="checkbox" name="sizes" value="XXL"> XXL</label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Color Options *</label>
+                                <div class="flex flex-wrap gap-4">
+                                    <label><input type="checkbox" name="colors" value="Black"> Black</label>
+                                    <label><input type="checkbox" name="colors" value="White"> White</label>
+                                    <label><input type="checkbox" name="colors" value="Navy"> Navy</label>
+                                    <label><input type="checkbox" name="colors" value="Olive"> Olive</label>
+                                    <label><input type="checkbox" name="colors" value="Gray"> Gray</label>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Material & Fabric -->
+                        <section class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Material & Fabric</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Material Composition
+                                        *</label>
+                                    <select name="material" required class="w-full px-3 py-2 border rounded-md">
+                                        <option value="">Select Material</option>
+                                        <option value="100% Cotton">100% Cotton</option>
+                                        <option value="Cotton Terry">Cotton Terry</option>
+                                        <option value="Cotton Blend">Cotton Blend</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">GSM *</label>
+                                    <input type="number" name="gsm" required min="100"
+                                        class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-8">
+                        <section class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Product Media</h3>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Upload Images (Up to 8)
+                                *</label>
+                            <input type="file" name="productImages" multiple accept="image/*"
+                                class="w-full px-3 py-2 border rounded-md">
+                        </section>
+
+                        <section class="pt-6">
+                            <button type="submit" class="w-full bg-black text-white font-medium py-3 px-4 rounded-md">
+                                Add Product
+                            </button>
+                        </section>
+
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById("productForm").addEventListener("submit", function () {
+            alert("Product Added Successfully!");
+        });
+
+        // Toggle mobile menu
+        document.getElementById("menuToggle").addEventListener("click", function () {
+            const mobileMenu = document.getElementById("mobileMenu");
+            mobileMenu.classList.toggle("hidden");
+        });
+    </script>
+</body>
+
+</html>

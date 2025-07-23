@@ -1,0 +1,75 @@
+<html>
+
+<head>
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+  <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+    href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800" />
+
+  <title>Sign up</title>
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body>
+  <div class="relative flex size-full min-h-screen flex-col bg-[#f8f9fc] group/design-root overflow-x-hidden"
+    style='--checkbox-tick-svg: url(&apos;data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(248,249,252)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e&apos;); font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
+    <div class="layout-container flex h-full grow flex-col">
+      <div class="px-40 flex flex-1 justify-center py-5">
+        <div class="layout-content-container flex flex-col w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1">
+          <h1 class="text-[#0e121b] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 text-center pb-3 pt-5">
+            Sign up</h1>
+          <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+            <label class="flex flex-col min-w-40 flex-1">
+              <p class="text-[#0e121b] text-base font-medium leading-normal pb-2">Email</p>
+              <input placeholder="Email"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0e121b] focus:outline-0 focus:ring-0 border-none bg-[#e7ebf3] focus:border-none h-14 placeholder:text-[#4e6797] p-4 text-base font-normal leading-normal"
+                value="" />
+            </label>
+          </div>
+          <p class="text-[#4e6797] text-sm font-normal leading-normal pb-3 pt-1 px-4">You will receive a confirmation
+            email</p>
+          <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+            <label class="flex flex-col min-w-40 flex-1">
+              <p class="text-[#0e121b] text-base font-medium leading-normal pb-2">Password</p>
+              <input placeholder="Password"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0e121b] focus:outline-0 focus:ring-0 border-none bg-[#e7ebf3] focus:border-none h-14 placeholder:text-[#4e6797] p-4 text-base font-normal leading-normal"
+                value="" />
+            </label>
+          </div>
+          <p class="text-[#4e6797] text-sm font-normal leading-normal pb-3 pt-1 px-4">Use at least 8 characters.</p>
+          <div class="px-4">
+            <label class="flex gap-x-3 py-3 flex-row">
+              <input type="checkbox"
+                class="h-5 w-5 rounded border-[#d0d7e7] border-2 bg-transparent text-[#306de8] checked:bg-[#306de8] checked:border-[#306de8] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#d0d7e7] focus:outline-none"
+                checked="" />
+              <p class="text-[#0e121b] text-base font-normal leading-normal">I am over 13 years old.</p>
+            </label>
+          </div>
+          <div class="flex px-4 py-3">
+            <form action="/auth/google" method="GET" class="flex flex-1">
+              <button type="submit"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 flex-1 bg-[#e7ebf3] text-[#0e121b] gap-2 text-sm font-bold leading-normal tracking-[0.015em]">
+                <div class="text-[#0e121b]" data-icon="GoogleLogo" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M224,128a96,96,0,1,1-21.95-61.09,8,8,0,1,1-12.33,10.18A80,80,0,1,0,207.6,136H128a8,8,0,0,1,0-16h88A8,8,0,0,1,224,128Z">
+                    </path>
+                  </svg>
+                </div>
+                <span class="truncate">Continue with Google</span>
+              </button>
+            </form>
+          </div>
+
+          <p class="text-[#4e6797] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">
+            By continuing, you agree to our Terms of Service and Privacy Policy
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

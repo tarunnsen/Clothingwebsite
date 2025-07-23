@@ -1,0 +1,135 @@
+.banner {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%),
+        url("https://cdn.usegalileo.ai/sdxl10/e81cdefc-e9e5-4d69-8322-af5a97c57dd0.png");
+    transition: background-image 0.5s ease-in-out;
+}
+
+.banner:hover {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%),
+        url("https://cdn.usegalileo.ai/sdxl10/7a80f7be-fc36-43d1-8351-d7834ba9a48b.png");
+}
+/* Custom styles beyond Tailwind */
+.product-card:hover .quick-view-button {
+    opacity: 1;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    border-color: #3B82F6;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Add this CSS to your styles */
+.section-padding {
+    padding-top: 1rem; /* Reduced padding at the top */
+    padding-bottom: 1rem; /* Reduced padding at the bottom */
+}
+
+.section-title-margin {
+    margin-bottom: 1.5rem; /* Reduced margin below the section title */
+}
+
+/* Custom styles for The Paddler's Admin Panel */
+
+/* Form focus styles */
+.form-checkbox:focus, 
+.form-radio:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c5c5c5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+/* Drag and drop highlight */
+.drag-active {
+  border-color: #6366f1;
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* Image preview hover effects */
+.image-preview {
+  transition: transform 0.2s;
+}
+
+.image-preview:hover {
+  transform: scale(1.05);
+}
+
+/* Form section hover effect */
+form section {
+  transition: box-shadow 0.3s;
+}
+
+form section:hover {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Required field indicator */
+label.required::after {
+  content: " *";
+  color: #ef4444;
+}
+
+/* Success message animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.success-message {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Error message shake animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.error-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
