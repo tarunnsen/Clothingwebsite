@@ -55,7 +55,7 @@ router.post("/login", async function (req, res) {
 });
 
 router.get("/dashboard", validateAdmin, async function (req, res) {
-    res.render("admin_dashboard");
+    res.render("Admin_dashboard");
 });
 
 router.get("/products", validateAdmin, async function (req, res) {
