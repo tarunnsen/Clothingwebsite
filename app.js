@@ -16,31 +16,30 @@ require("./config/google_auth");
 const redisClient = require("./config/redis");
 
 const app = express();
-app.set("trust proxy", 1); // Very important for secure cookies behind proxies like Render
 
-// Middleware
+// ✅ Trust proxy is very important on Render
+app.set("trust proxy", 1);
+
+// ✅ Middlewares
 app.use(compression());
 app.use(cors({
   origin: true,
   credentials: true,
 }));
 app.use(morgan("dev"));
-
-// Static files
 app.use("/uploads", express.static("uploads"));
 app.use(express.static(path.join(__dirname, "public")));
-
-// Parsers
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Redis session store
+// ✅ Redis Session Store
 const redisStore = new RedisStore({
   client: redisClient,
   prefix: "session:",
 });
 
+// ✅ Session Configuration
 app.use(
   session({
     store: redisStore,
@@ -56,36 +55,37 @@ app.use(
   })
 );
 
-// Passport
+// ✅ Passport Initialization
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Save redirect URL for unauthenticated requests
-app.use((req, res, next) => {
+// ✅ Save Redirect URL (before login)
+app.use(async (req, res, next) => {
   if (
     !req.isAuthenticated?.() &&
     (req.path.startsWith("/product/") ||
-     req.path.startsWith("/cart") ||
-     req.path.startsWith("/checkout")) &&
+      req.path.startsWith("/cart") ||
+      req.path.startsWith("/checkout")) &&
     !req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg)$/)
   ) {
-    redisClient.set(
-      `redirect:${req.sessionID}`,
-      req.originalUrl,
-      "EX",
-      300,
-      (err) => {
-        if (err) console.error("Redis error:", err);
-      }
-    );
+    try {
+      await redisClient.set(
+        `redirect:${req.sessionID}`,
+        req.originalUrl,
+        { EX: 300 }
+      );
+      console.log(`🔁 Saved redirect URL for session ${req.sessionID}: ${req.originalUrl}`);
+    } catch (err) {
+      console.error("Redis error while saving redirect path:", err);
+    }
   }
   next();
 });
 
-// View engine
+// ✅ View Engine
 app.set("view engine", "ejs");
 
-// Routes
+// ✅ Routes
 app.use("/", require("./routes"));
 app.use("/auth", require("./routes/auth"));
 app.use("/users", require("./routes/user"));
@@ -94,10 +94,12 @@ app.use("/product", require("./routes/product"));
 app.use("/payment", require("./routes/payment"));
 app.use("/order", require("./routes/order"));
 
-// Route listing (for debugging)
+// ✅ Route Listing for Debug
 const expressListRoutes = require("express-list-routes");
 expressListRoutes(app);
 
-// Server start
+// ✅ Server Start
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
