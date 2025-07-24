@@ -6,7 +6,6 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const dotenv = require("dotenv");
 
-// ✅ Added for performance and logs
 const compression = require("compression");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -17,14 +16,17 @@ require("./config/google_auth");
 const redisClient = require("./config/redis");
 
 const app = express();
-app.set("trust proxy", 1);
+app.set("trust proxy", 1); // Very important for secure cookies behind proxies like Render
 
-// ✅ Use compression, CORS and request logger
+// Middleware
 app.use(compression());
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 app.use(morgan("dev"));
 
-// Static Files
+// Static files
 app.use("/uploads", express.static("uploads"));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -33,7 +35,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Redis Session Store
+// Redis session store
 const redisStore = new RedisStore({
   client: redisClient,
   prefix: "session:",
@@ -46,8 +48,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === "PRODUCTION",
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === "PRODUCTION" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
   })
@@ -57,13 +60,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Save redirect path for unauthenticated access
+// Save redirect URL for unauthenticated requests
 app.use((req, res, next) => {
   if (
     !req.isAuthenticated?.() &&
     (req.path.startsWith("/product/") ||
-      req.path.startsWith("/cart") ||
-      req.path.startsWith("/checkout")) &&
+     req.path.startsWith("/cart") ||
+     req.path.startsWith("/checkout")) &&
     !req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg)$/)
   ) {
     redisClient.set(
@@ -79,7 +82,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// View Engine
+// View engine
 app.set("view engine", "ejs");
 
 // Routes
@@ -91,9 +94,10 @@ app.use("/product", require("./routes/product"));
 app.use("/payment", require("./routes/payment"));
 app.use("/order", require("./routes/order"));
 
+// Route listing (for debugging)
 const expressListRoutes = require("express-list-routes");
 expressListRoutes(app);
 
-// Start Server
+// Server start
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
