@@ -1,80 +1,76 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const redisClient = require("../config/redis");
 
-// Start Google OAuth
-router.get("/google", passport.authenticate("google", {
-  scope: ["profile", "email"]
-}));
 
-// Google OAuth Callback
-router.get("/google/callback", (req, res, next) => {
-  passport.authenticate("google", async (err, user) => {
-    const fallbackURL = "/users/signin"; // fallback route if redirect fails
+// 🚀 Start Google OAuth
+router.get("/google", (req, res, next) => {
 
-    if (err || !user) {
-      console.error("Google Auth Error:", err || "User not found");
+  try {
 
-      // Try to redirect back to saved URL from Redis (even on error)
-      const redirectKey = `redirect:${req.sessionID}`;
-      try {
-        const savedURL = await redisClient.get(redirectKey);
-        if (savedURL) {
-          await redisClient.del(redirectKey);
-          return res.redirect(savedURL);
-        }
-      } catch (e) {
-        console.error("Redis error during fallback redirect:", e);
-      }
+    // signin page से redirect URL लो
+    const redirectURL = req.query.redirect || "/";
 
-      return res.redirect(fallbackURL);
-    }
+    console.log("🔁 Passing redirect in OAuth state:", redirectURL);
 
-    const oldSessionID = req.sessionID;
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      prompt: "select_account",
+      state: redirectURL
+    })(req, res, next);
 
-    req.session.regenerate((regenErr) => {
-      if (regenErr) {
-        console.error("Session regeneration error:", regenErr);
-        return res.redirect(fallbackURL);
-      }
+  } catch (err) {
 
-      req.logIn(user, async (loginErr) => {
-        if (loginErr) {
-          console.error("Login error:", loginErr);
-          return res.redirect(fallbackURL);
-        }
+    console.error("Google OAuth start error:", err);
+    res.redirect("/");
 
-        try {
-          const redirectKey = `redirect:${oldSessionID}`;
-          const redirectURL = await redisClient.get(redirectKey);
+  }
 
-          if (redirectURL) {
-            await redisClient.del(redirectKey);
-            console.log("Redirecting to saved URL:", redirectURL);
-            return res.redirect(redirectURL);
-          }
-
-          return res.redirect("/");
-        } catch (e) {
-          console.error("Redis fetch error:", e);
-          return res.redirect("/");
-        }
-      });
-    });
-  })(req, res, next);
 });
 
-// Logout Route
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/users/signin"
+  }),
+  (req, res) => {
+
+    try {
+
+      const redirectURL = req.query.state || "/";
+
+      console.log("✅ Redirecting user to:", redirectURL);
+
+      res.redirect(redirectURL);
+
+    } catch (err) {
+
+      console.error("Redirect error:", err);
+      res.redirect("/");
+
+    }
+
+  }
+);
+
+
+// 🚀 Logout
 router.get("/logout", (req, res) => {
+
   req.logout((err) => {
+
     if (err) {
       console.error("Logout error:", err);
     }
+
     req.session.destroy(() => {
       res.redirect("/");
     });
+
   });
+
 });
+
 
 module.exports = router;

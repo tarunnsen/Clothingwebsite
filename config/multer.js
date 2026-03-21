@@ -1,3 +1,40 @@
+
+// // config/multer.js
+// const multer = require("multer");
+
+// // Google Drive ke liye memoryStorage use karenge
+// const storage = multer.memoryStorage();
+
+// const upload = multer({ storage: storage });
+
+// module.exports = upload;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // config/multer.js
 const multer = require("multer");
 const path = require("path");

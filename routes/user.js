@@ -7,7 +7,11 @@ router.get("/signup", (req, res) => {
 });
 
 router.get("/signin", (req, res) => {
-    res.render("usersignin"); // 'log in.ejs' ko render karega
+
+  const redirect = req.query.redirect || "/";
+
+  res.render("usersignin", { redirect });
+
 });
 
 module.exports = router;

@@ -1,8 +1,22 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
 
-// we bring the url from env file.
-mongoose.connect(process.env.MONGOURL).then(function(){
-    console.log("connected to mongodb");
-})
+async function connectDB() {
+
+  try {
+
+    await mongoose.connect(process.env.MONGOURL);
+
+    console.log("✅ connected to mongodb");
+
+  } catch (err) {
+
+    console.error("❌ MongoDB connection error:", err.message);
+
+  }
+
+}
+
+connectDB();
 
 module.exports = mongoose.connection;

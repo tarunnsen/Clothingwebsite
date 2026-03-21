@@ -10,7 +10,7 @@ const { sendSMS } = require("../utils/twilioService.js.js"); // ✅ Twilio Servi
 const path = require("path");
 const fs = require("fs");
 const Order = require("../models/order.js");
-const redisClient = require("../config/redis"); // ✅ Import Redis client 
+
 
 
 const router = express.Router();
@@ -29,19 +29,11 @@ router.get("/user/details", (req, res) => {
 });
 
 router.get("/checkout/:productId", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    try {
-      if (redisClient.isReady) {
-        await redisClient.setEx(`redirect:${req.sessionID}`, 300, `/product/${req.params.productId}`);
-      }
-      req.session.oldSessionID = req.sessionID; // ✅ Store the current session ID for later
-    } catch (err) {
-      console.error("Redis Error:", err);
-    }
+  if (!req.user) {
 
-    return res.redirect("/users/signin");
+    return res.redirect(`/users/signin?redirect=${encodeURIComponent(req.originalUrl)}`);
+
   }
-
 
   try {
     // ✅ Get product details
