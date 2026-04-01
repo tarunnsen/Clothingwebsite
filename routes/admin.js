@@ -2,13 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { adminModel } = require("../models/admin");
 const orderModel = require("../models/order")
-
-const { validateAdmin, userIsLoggedIn } = require("../middleware/admin"); // ✅ Sahi Import
-
+const { validateAdmin } = require("../middleware/admin");
 const { productModel } = require("../models/product")
-const bcrypt = require("bcrypt");//
-const jwt = require("jsonwebtoken");//
-const { categoryModel } = require("../models/category");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { sendSMS } = require("../utils/twilioService.js"); // ✅ Twilio Service Import करें
 
 require("dotenv").config();
@@ -135,7 +132,7 @@ router.post("/update-order", async (req, res) => {
             return res.status(400).json({ success: false, message: "Missing Order ID or Status" });
         }
 
-        // ✅ Database में Order Update करें
+
         const updatedOrder = await orderModel.findOneAndUpdate(
             { orderId },
             { status },
@@ -148,7 +145,6 @@ router.post("/update-order", async (req, res) => {
 
         console.log("✅ Order Updated Successfully:", updatedOrder);
 
-        // ✅ **Order Status के हिसाब से SMS भेजें**
         let smsBody = "";
 
         if (status === "shipped") {
@@ -166,7 +162,7 @@ router.post("/update-order", async (req, res) => {
                     { new: true }
                 );
 
-                // ✅ **अगर stock 0 हो जाए तो product delete कर दो**
+
                 if (product.stock <= 0) {
                     await productModel.findByIdAndDelete(product._id);
                     console.log(`🚨 Product Deleted: ${product.name} (ID: ${product._id})`);
@@ -178,7 +174,7 @@ router.post("/update-order", async (req, res) => {
             smsBody = `❌ Your order ${orderId} has been cancelled. If this was a mistake, please contact support.`;
         }
 
-        // ✅ अगर कोई SMS भेजने लायक Status है, तो Send करें
+
         if (smsBody) {
             await sendSMS(updatedOrder.phone, smsBody);
             console.log(`✅ SMS Sent for Status: ${status}`);

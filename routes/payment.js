@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
-const { paymentModel } = require("../models/payment");
 const { productModel } = require("../models/product");
 const nodemailer = require("nodemailer");
 const { generateInvoice } = require("../utils/generateInvoice.js");
@@ -345,9 +344,5 @@ router.get("/download-invoice/:orderId", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
-
-
-
-
 
 module.exports = router;

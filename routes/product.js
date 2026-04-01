@@ -4,7 +4,7 @@ const router = express.Router();
 const { productModel } = require("../models/product");
 const { categoryModel } = require("../models/category");
 const upload = require("../config/multer"); // multer with diskStorage
-const { validateAdmin, userIsLoggedIn } = require("../middleware/admin");
+const { validateAdmin } = require("../middleware/admin");
 
 router.get("/", async (req, res) => {
     let products = await productModel.find().populate("category");

@@ -6,7 +6,7 @@ async function generateInvoice(order) {
     return new Promise((resolve, reject) => {
         const invoicesFolder = path.join(__dirname, "../invoices"); // ✅ Correct Folder Path
 
-        // ✅ अगर फोल्डर नहीं है, तो इसे बनाओ
+        //
         if (!fs.existsSync(invoicesFolder)) {
             fs.mkdirSync(invoicesFolder, { recursive: true });
         }
