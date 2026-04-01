@@ -8,7 +8,6 @@ router.get("/google", (req, res, next) => {
 
   try {
 
-    // signin page से redirect URL लो
     const redirectURL = req.query.redirect || "/";
 
     console.log("🔁 Passing redirect in OAuth state:", redirectURL);
