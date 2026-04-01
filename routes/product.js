@@ -32,21 +32,18 @@ router.post("/", upload.array("productImages", 8), async (req, res) => {
             colors,
             material,
             gsm,
-            category, // can be a string or array
+            category,
             description,
         } = req.body;
 
-        // Convert to array if needed
         if (typeof sizes === "string") sizes = [sizes];
         if (typeof colors === "string") colors = [colors];
         if (typeof category === "string") category = [category];
 
-        // Basic validation
         if (!productName || !sku || !price || !stockQuantity || !material || !gsm) {
             return res.status(400).send("Missing required fields.");
         }
 
-        // Process categories: find or create, collect IDs
         let categoryIds = [];
         if (Array.isArray(category)) {
             for (let catName of category) {
@@ -58,10 +55,9 @@ router.post("/", upload.array("productImages", 8), async (req, res) => {
             }
         }
 
-        // Get image paths
-        const imagePaths = req.files.map(file => "/uploads/" + file.filename);
+        // 🔥 FIXED LINE (Cloudinary support)
+        const imagePaths = req.files.map(file => file.path);
 
-        // Save product
         await productModel.create({
             name: productName,
             sku,
