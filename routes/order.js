@@ -1,26 +1,39 @@
 const express = require("express");
 const router = express.Router();
-const { paymentModel } = require("../models/payment");
+const Order = require("../models/order"); // ✅ FIXED
 
 router.get("/:orderid", async (req, res) => {
     try {
         const orderId = req.params.orderid;
 
-        // ✅ Ensure orderId is a valid string and not mistaken for _id
         if (!orderId || orderId.length < 10) {
-            return res.status(400).json({ success: false, message: "Invalid Order ID" });
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Order ID"
+            });
         }
 
-        const paymentDetails = await paymentModel.findOne({ orderId: orderId });
+        // ✅ FIXED: Order model use
+        const order = await Order.findOne({ orderId });
 
-        if (!paymentDetails) {
-            return res.status(404).json({ success: false, message: "Order not found" });
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
         }
 
-        res.json({ success: true, data: paymentDetails });
+        res.json({
+            success: true,
+            data: order
+        });
+
     } catch (error) {
         console.error("Error fetching order:", error.message);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
     }
 });
 
