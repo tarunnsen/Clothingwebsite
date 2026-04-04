@@ -1,6 +1,6 @@
 const razorpay = require("../config/razorpay");
 const Order = require("../models/order");
-const { sendOrderEmailToAdmin } = require("../utils/sendmail");
+const { sendOrderEmailToAdmin } = require("../utils/sendMail");
 const { runInBackground } = require("../utils/background");
 const crypto = require("crypto");
 const { generateInvoice } = require("../utils/generateInvoice");
