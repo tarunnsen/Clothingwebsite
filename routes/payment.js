@@ -3,25 +3,15 @@ const express = require("express");
 const crypto = require("crypto");
 const { productModel } = require("../models/product");
 const { generateInvoice } = require("../utils/generateInvoice.js");
-const { sendSMS } = require("../utils/twilioService.js.js");
-const path = require("path");
-const fs = require("fs");
+const { sendSMS } = require("../utils/twilioService.js");
 const Order = require("../models/order.js");
 
 const { createOrder } = require("../controllers/paymentController.js");
+const { verifyPayment } = require("../controllers/paymentController.js");
 
 
 const router = express.Router();
 
-function runInBackground(task) {
-  setImmediate(() => {
-    Promise.resolve()
-      .then(task)
-      .catch((err) => {
-        console.error("Background task failed:", err?.message || err);
-      });
-  });
-}
 
 router.get("/user/details", (req, res) => {
   if (!req.isAuthenticated()) {
@@ -53,65 +43,7 @@ router.get("/checkout/:productId", async (req, res) => {
 
 router.post("/create/orderId", createOrder);
 
-router.post("/api/payment/verify", async (req, res) => {
-  try {
-    const { razorpayOrderId, razorpayPaymentId, signature } = req.body;
-
-    if (!razorpayOrderId || !razorpayPaymentId || !signature) {
-      return res.status(400).json({ success: false, message: "Missing payment details" });
-    }
-
-    const generatedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(razorpayOrderId + "|" + razorpayPaymentId)
-      .digest("hex");
-
-    if (generatedSignature !== signature) {
-      return res.status(400).json({ success: false, message: "Invalid signature" });
-    }
-
-    const order = await Order.findOne({ orderId: razorpayOrderId });
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found in database" });
-    }
-
-    order.status = "paid";
-    order.paymentId = razorpayPaymentId;
-
-    if (!order.address || order.address.street === "N/A") {
-      order.address = order.address || {
-        street: "Unknown",
-        city: "Unknown",
-        state: "Unknown",
-        zip: "Unknown",
-        country: "Unknown",
-      };
-    }
-
-    await order.save();
-
-    const orderIdForInvoice = order.orderId;
-    const phoneForSms = order.phone;
-
-    runInBackground(async () => {
-      await generateInvoice(order);
-      await sendSMS(
-        phoneForSms,
-        `🎉 Your order ${orderIdForInvoice} has been confirmed! 🚀`
-      );
-    });
-
-    res.json({
-      success: true,
-      message: "Payment verified successfully!",
-      invoiceUrl: `/payment/download-invoice/${order.orderId}`,
-      redirectUrl: `/thank-you?orderId=${razorpayOrderId}`,
-    });
-  } catch (error) {
-    console.error("Payment verify error:", error?.message || error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
+router.post("/api/payment/verify", verifyPayment);
 
 router.post("/webhook", async (req, res) => {
   try {
