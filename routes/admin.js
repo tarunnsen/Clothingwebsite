@@ -14,11 +14,11 @@ require("dotenv").config();
 router.get("/admin/create", async function (req, res) {
     try {
         let salt = await bcrypt.genSalt(10);
-        let hash = await bcrypt.hash("moniii", salt);
+        let hash = await bcrypt.hash("Tamonika@2580", salt);
 
         let user = new adminModel({
             name: "Tarun",
-            email: "tarun@gmail.com",
+            email: "Techfocus@gmail.com",
             password: hash,
             role: "admin",
         });
