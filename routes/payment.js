@@ -1,26 +1,18 @@
 require("dotenv").config();
 const express = require("express");
 const crypto = require("crypto");
-const Razorpay = require("razorpay");
 const { productModel } = require("../models/product");
-const nodemailer = require("nodemailer");
 const { generateInvoice } = require("../utils/generateInvoice.js");
 const { sendSMS } = require("../utils/twilioService.js.js");
 const path = require("path");
 const fs = require("fs");
 const Order = require("../models/order.js");
 
+const { createOrder } = require("../controllers/paymentController.js");
+
+
 const router = express.Router();
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-/**
- * Runs work after the current response cycle so HTTP handlers stay fast.
- * Errors are logged; they must not affect the response already sent.
- */
 function runInBackground(task) {
   setImmediate(() => {
     Promise.resolve()
@@ -29,38 +21,6 @@ function runInBackground(task) {
         console.error("Background task failed:", err?.message || err);
       });
   });
-}
-
-async function sendOrderEmailToAdmin(order) {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.ADMIN_EMAIL,
-      pass: process.env.APP_PASSWORD,
-    },
-  });
-
-  const mailOptions = {
-    from: process.env.ADMIN_EMAIL,
-    to: process.env.ADMIN_EMAIL,
-    subject: `New Order Received - ${order.orderId}`,
-    html: `
-      <h2>New Order Received</h2>
-      <p><b>Order ID:</b> ${order.orderId}</p>
-      <p><b>Customer Name:</b> ${order.customerName}</p>
-      <p><b>Email:</b> ${order.email}</p>
-      <p><b>Phone:</b> ${order.phone}</p>
-      <p><b>Address:</b> ${order.address.street}, ${order.address.city}, ${order.address.state} - ${order.address.zip}, ${order.address.country}</p>
-      <h3>Products:</h3>
-      <ul>
-        ${order.products.map((product) => `<li>${product.name} - ₹${product.price} x ${product.quantity}</li>`).join("")}
-      </ul>
-      <p><b>Total Amount:</b> ₹${order.amount}</p>
-      <p><b>Status:</b> ${order.status}</p>
-    `,
-  };
-
-  await transporter.sendMail(mailOptions);
 }
 
 router.get("/user/details", (req, res) => {
@@ -91,55 +51,7 @@ router.get("/checkout/:productId", async (req, res) => {
   }
 });
 
-router.post("/create/orderId", async (req, res) => {
-  try {
-    const { name, email, phone, address, products, totalAmount } = req.body;
-
-    if (!products || products.length === 0 || !totalAmount || isNaN(totalAmount)) {
-      return res.status(400).json({ success: false, message: "Invalid order details" });
-    }
-
-    const amountInPaise = parseInt(totalAmount, 10) * 100;
-
-    const options = {
-      amount: amountInPaise,
-      currency: "INR",
-      receipt: `order_${Date.now()}`,
-      payment_capture: 1,
-    };
-
-    const order = await razorpay.orders.create(options);
-
-    const newOrder = await Order.create({
-      orderId: order.id,
-      customerName: name || "Unknown",
-      email: email || "no-email@example.com",
-      phone: phone || "0000000000",
-      address: {
-        street: address?.street || "N/A",
-        city: address?.city || "N/A",
-        state: address?.state || "N/A",
-        zip: address?.zip || "N/A",
-        country: address?.country || "N/A",
-      },
-      products: products,
-      amount: order.amount / 100,
-      status: "pending",
-    });
-
-    runInBackground(() => sendOrderEmailToAdmin(newOrder));
-
-    res.json({
-      success: true,
-      orderId: order.id,
-      amount: order.amount,
-      key: process.env.RAZORPAY_KEY_ID,
-    });
-  } catch (error) {
-    console.error("Create order error:", error.response?.data || error?.message || error);
-    res.status(500).json({ success: false, message: "Payment gateway error" });
-  }
-});
+router.post("/create/orderId", createOrder);
 
 router.post("/api/payment/verify", async (req, res) => {
   try {
