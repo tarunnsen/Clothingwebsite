@@ -1,16 +1,16 @@
 require("dotenv").config();
 const express = require("express");
-const crypto = require("crypto");
 const { productModel } = require("../models/product");
-const Order = require("../models/order.js");
 
-const { createOrder } = require("../controllers/paymentController.js");
-const { verifyPayment } = require("../controllers/paymentController.js");
-const { webhookHandler } = require("../controllers/paymentController.js");
+const {
+  createOrder,
+  verifyPayment,
+  webhookHandler
+} = require("../controllers/paymentController");
 
 const router = express.Router();
 
-
+// User details
 router.get("/user/details", (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: "Not logged in" });
@@ -18,6 +18,7 @@ router.get("/user/details", (req, res) => {
   res.json({ name: req.user.name, email: req.user.email });
 });
 
+// Checkout page
 router.get("/checkout/:productId", async (req, res) => {
   if (!req.user) {
     return res.redirect(`/users/signin?redirect=${encodeURIComponent(req.originalUrl)}`);
@@ -39,32 +40,9 @@ router.get("/checkout/:productId", async (req, res) => {
   }
 });
 
+// Payment routes
 router.post("/create/orderId", createOrder);
-
 router.post("/api/payment/verify", verifyPayment);
-
 router.post("/webhook", webhookHandler);
-
-router.get("/download-invoice/:orderId", async (req, res) => {
-  try {
-    const { orderId } = req.params;
-
-    const order = await Order.findOne({ orderId });
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found!" });
-    }
-
-    const invoicePath = path.join(__dirname, "../invoices", `${orderId}.pdf`);
-
-    if (!fs.existsSync(invoicePath)) {
-      return res.status(404).json({ success: false, message: "Invoice not found!" });
-    }
-
-    res.download(invoicePath);
-  } catch (error) {
-    console.error("Download invoice error:", error?.message || error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
 
 module.exports = router;
