@@ -5,6 +5,8 @@ const { runInBackground } = require("../utils/background");
 const crypto = require("crypto");
 const { generateInvoice } = require("../utils/generateInvoice");
 const { sendSMS } = require("../utils/twilioService");
+const fs = require("fs");
+const path = require("path");
 
 exports.createOrder = async (req, res) => {
     try {
@@ -213,6 +215,40 @@ exports.webhookHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
+    });
+  }
+};
+
+exports.downloadInvoice = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findOne({ orderId });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found"
+      });
+    }
+
+    const invoicePath = path.join(__dirname, "../invoices", `${orderId}.pdf`);
+
+    if (!fs.existsSync(invoicePath)) {
+      return res.status(404).json({
+        success: false,
+        message: "Invoice not found"
+      });
+    }
+
+    res.download(invoicePath);
+
+  } catch (error) {
+    console.error("DownloadInvoice Error:", error?.message || error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
     });
   }
 };
