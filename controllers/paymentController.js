@@ -141,3 +141,78 @@ exports.verifyPayment = async (req, res) => {
         });
     }
 };
+
+exports.webhookHandler = async (req, res) => {
+  try {
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      return res.status(500).json({
+        success: false,
+        message: "Webhook secret missing",
+      });
+    }
+
+    const signature = req.headers["x-razorpay-signature"];
+    const body = JSON.stringify(req.body);
+
+    const expectedSignature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(body)
+      .digest("hex");
+
+    if (signature !== expectedSignature) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid signature",
+      });
+    }
+
+    const { payload } = req.body;
+    const payment = payload.payment.entity;
+
+    const orderId = payment.order_id;
+    const paymentId = payment.id;
+    const phone = payment.contact;
+
+    const newAddress = {
+      street: payment.notes?.street || "N/A",
+      city: payment.notes?.city || "N/A",
+      state: payment.notes?.state || "N/A",
+      zip: payment.notes?.zip || "N/A",
+      country: payment.notes?.country || "N/A",
+    };
+
+    const existingOrder = await Order.findOne({ orderId });
+
+    if (!existingOrder) {
+      return res.status(400).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (
+      !existingOrder.address ||
+      existingOrder.address.street === "N/A" ||
+      existingOrder.address.city === "N/A"
+    ) {
+      existingOrder.address = newAddress;
+    }
+
+    existingOrder.status = "paid";
+    existingOrder.phone = phone;
+    existingOrder.paymentId = paymentId;
+
+    await existingOrder.save();
+
+    res.json({ success: true });
+
+  } catch (error) {
+    console.error("[WEBHOOK_ERROR]", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
