@@ -15,21 +15,18 @@ const {
   thankYouPage
 } = require("../controllers/storefrontController");
 
-const {
-  checkoutPage
-} = require("../controllers/checkoutController");
-
-// Cart
+// ======================
+// CART
+// ======================
 router.get("/cart/auth-check", authCheck);
 router.get("/cart", getCart);
 router.get("/cart/add/:id", addToCart);
 router.get("/cart/decrease/:id", decreaseQuantity);
 router.get("/cart/remove/:id", removeFromCart);
 
-// Checkout
-router.get("/checkout/:cartId", checkoutPage);
-
-// Storefront
+// ======================
+// STOREFRONT
+// ======================
 router.get("/", getHome);
 router.get("/product/:id", getProduct);
 router.get("/thank-you", thankYouPage);

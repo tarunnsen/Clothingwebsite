@@ -1,31 +1,43 @@
+const { productModel } = require("../models/product");
 const { cartModel } = require("../models/cart");
 
-// ======================
-// CHECKOUT PAGE
-// ======================
 exports.checkoutPage = async (req, res) => {
+  if (!req.user) {
+    return res.redirect(
+      `/users/signin?redirect=${encodeURIComponent(req.originalUrl)}`
+    );
+  }
+
   try {
-    // Auth check
-    if (!req.isAuthenticated()) {
-      req.session.returnTo = `/checkout/${req.params.cartId}`;
-      return res.redirect("/users/signin");
-    }
+    let product = null;
+    let cart = null;
 
-    const cart = await cartModel
-      .findOne({ _id: req.params.cartId })
-      .populate("products.productId");
+    //  try product first
+    product = await productModel.findById(req.params.id);
 
-    if (!cart || cart.products.length === 0) {
-      return res.redirect("/cart");
+    if (product) {
+      cart = {
+        products: [{ productId: product, quantity: 1 }]
+      };
+    } else {
+      //  fallback: treat as cartId
+      cart = await cartModel
+        .findOne({ user: req.session?.passport?.user })
+        .populate("products.productId");
+
+      if (!cart) {
+        return res.status(404).send("Cart not found");
+      }
     }
 
     res.render("checkout", {
-      cart,
-      user: req.user
+      product,
+      user: req.user,
+      cart
     });
 
-  } catch (err) {
-    console.error("Checkout Error:", err);
+  } catch (error) {
+    console.error("Checkout Error:", error?.message || error);
     res.status(500).send("Internal Server Error");
   }
 };
