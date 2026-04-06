@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 
+const router = express.Router(); // 🔥 TOP PAR
+
 const {
   createOrder,
   verifyPayment,
@@ -8,13 +10,24 @@ const {
   downloadInvoice
 } = require("../controllers/paymentController");
 
-//  ADD THIS
 const { checkoutPage } = require("../controllers/checkoutController");
 
-const router = express.Router();
+// ======================
+// USER DETAILS (temporary but required)
+// ======================
+router.get("/user/details", (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  res.json({
+    name: req.user.name,
+    email: req.user.email
+  });
+});
 
 // ======================
-// CHECKOUT (IMPORTANT)
+// CHECKOUT
 // ======================
 router.get("/checkout/:id", checkoutPage);
 
