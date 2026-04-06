@@ -2,74 +2,25 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
+const {
+  googleAuth,
+  googleCallback,
+  logoutUser
+} = require("../controllers/authController");
 
-// 🚀 Start Google OAuth
-router.get("/google", (req, res, next) => {
+// Google OAuth start
+router.get("/google", googleAuth);
 
-  try {
-
-    const redirectURL = req.query.redirect || "/";
-
-    console.log("🔁 Passing redirect in OAuth state:", redirectURL);
-
-    passport.authenticate("google", {
-      scope: ["profile", "email"],
-      prompt: "select_account",
-      state: redirectURL
-    })(req, res, next);
-
-  } catch (err) {
-
-    console.error("Google OAuth start error:", err);
-    res.redirect("/");
-
-  }
-
-});
-
-
+// Google callback (IMPORTANT: passport stays here)
 router.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/users/signin"
   }),
-  (req, res) => {
-
-    try {
-
-      const redirectURL = req.query.state || "/";
-
-      console.log("✅ Redirecting user to:", redirectURL);
-
-      res.redirect(redirectURL);
-
-    } catch (err) {
-
-      console.error("Redirect error:", err);
-      res.redirect("/");
-
-    }
-
-  }
+  googleCallback
 );
 
-
-// 🚀 Logout
-router.get("/logout", (req, res) => {
-
-  req.logout((err) => {
-
-    if (err) {
-      console.error("Logout error:", err);
-    }
-
-    req.session.destroy(() => {
-      res.redirect("/");
-    });
-
-  });
-
-});
-
+// Logout
+router.get("/logout", logoutUser);
 
 module.exports = router;
