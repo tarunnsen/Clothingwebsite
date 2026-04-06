@@ -84,9 +84,9 @@ app.use((req, res, next) => {
     req.path.startsWith("/checkout");
 
   if (!req.user && needsAuthRoute && !isStaticFile) {
-    req.session.returnTo = req.originalUrl;
-
-    console.log("🔁 Saved redirect URL:", req.originalUrl);
+    return res.redirect(
+      `/users/signin?redirect=${encodeURIComponent(req.originalUrl)}`
+    );
   }
 
   next();

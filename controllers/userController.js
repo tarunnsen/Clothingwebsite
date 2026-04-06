@@ -3,6 +3,9 @@ exports.getSignupPage = (req, res) => {
 };
 
 exports.getSigninPage = (req, res) => {
-  const redirect = req.query.redirect || "/";
+   const redirect = req.query.redirect
+    ? decodeURIComponent(req.query.redirect)
+    : "/";
+
   res.render("usersignin", { redirect });
 };
