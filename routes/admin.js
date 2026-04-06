@@ -35,7 +35,7 @@ const {
 // ======================
 // AUTH ROUTES
 // ======================
-router.get("/admin/create", createAdmin);
+router.get("/create", createAdmin);
 router.get("/login", loginPage);
 router.post("/login", loginAdmin);
 router.get("/logout", validateAdmin, logoutAdmin);
@@ -51,7 +51,6 @@ router.get("/dashboard", validateAdmin, dashboard);
 router.get("/products", validateAdmin, getProducts);
 router.get("/product/:id", validateAdmin, getProductDetails);
 
-// ✅ NEW (IMPORTANT)
 router.post(
   "/product",
   validateAdmin,
@@ -59,8 +58,9 @@ router.post(
   createProduct
 );
 
+
 router.get(
-  "/product/delete/:id",
+  "/product/:id/delete",
   validateAdmin,
   deleteProduct
 );
@@ -69,6 +69,7 @@ router.get(
 // ORDER ROUTES
 // ======================
 router.get("/orders", validateAdmin, getOrders);
-router.post("/update-order", updateOrder);
+
+router.post("/order/update", updateOrder);
 
 module.exports = router;
