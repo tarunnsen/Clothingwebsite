@@ -1,17 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-// Route to render signup page
-router.get("/signup", (req, res) => {
-    res.render("usersignup"); // 'signup.ejs' ko render karega
-});
+const {
+  getSignupPage,
+  getSigninPage
+} = require("../controllers/userController");
 
-router.get("/signin", (req, res) => {
+// Signup page
+router.get("/signup", getSignupPage);
 
-  const redirect = req.query.redirect || "/";
-
-  res.render("usersignin", { redirect });
-
-});
+// Signin page
+router.get("/signin", getSigninPage);
 
 module.exports = router;
