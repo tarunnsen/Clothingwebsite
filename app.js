@@ -56,8 +56,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,        // 🔥 ALWAYS TRUE for production (Render HTTPS)
-      sameSite: "none",    // 🔥 CRITICAL FIX (OAuth ke liye)
+      secure: true,        
+      sameSite: "none",   
       maxAge: 24 * 60 * 60 * 1000,
     },
   })
