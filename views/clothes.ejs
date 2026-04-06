@@ -31,8 +31,8 @@
           <a href="/admin/logout" class="text-white hover:underline">Logout</a>
           <div class="flex items-center space-x-2">
             <span class="text-white">Admin User</span>
-            <img class="h-8 w-8 rounded-full"
-              src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin" />
+            <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=random"
+              alt="Admin" />
           </div>
         </nav>
       </div>
@@ -45,8 +45,8 @@
         <a href="/admin/logout" class="text-white hover:underline block">Logout</a>
         <div class="flex items-center space-x-2 mt-2">
           <span class="text-white">Admin User</span>
-          <img class="h-8 w-8 rounded-full"
-            src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin" />
+          <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=random"
+            alt="Admin" />
         </div>
       </div>
     </div>
@@ -78,14 +78,21 @@
                   <img src="<%= elem.images?.[0] || '/images/default.jpg' %>" alt="<%= elem.name %>"
                     class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded mx-auto" />
                 </td>
-                <td class="border px-2 py-2 text-center break-words"><%= elem._id %></td>
-                <td class="border px-2 py-2 text-center"><%= elem.name %></td>
-                <td class="border px-2 py-2 text-center font-semibold">₹<%= elem.price %></td>
-                <td class="border px-2 py-2 text-center"><%= elem.stock %></td>
+                <td class="border px-2 py-2 text-center break-words">
+                  <%= elem._id %>
+                </td>
+                <td class="border px-2 py-2 text-center">
+                  <%= elem.name %>
+                </td>
+                <td class="border px-2 py-2 text-center font-semibold">₹<%= elem.price %>
+                </td>
+                <td class="border px-2 py-2 text-center">
+                  <%= elem.stock %>
+                </td>
                 <td class="border px-2 py-2 text-center">
                   <div class="flex flex-col sm:flex-row gap-2 justify-center">
                     <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">Update</button>
-                    <a href="/admin/product/delete/<%= elem._id %>"
+                    <a href="/admin/product/<%= elem._id %>/delete"
                       class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Delete</a>
                   </div>
                 </td>
@@ -93,19 +100,19 @@
             </tbody>
           </table>
         </div>
-      <% }) %>
+        <% }) %>
     </main>
-  <% } %>
+    <% } %>
 
-  <!-- ✅ Toggle Script -->
-  <script>
-    const menuToggle = document.getElementById("menuToggle");
-    const mobileMenu = document.getElementById("mobileMenu");
+      <!-- ✅ Toggle Script -->
+      <script>
+        const menuToggle = document.getElementById("menuToggle");
+        const mobileMenu = document.getElementById("mobileMenu");
 
-    menuToggle.addEventListener("click", () => {
-      mobileMenu.classList.toggle("hidden");
-    });
-  </script>
+        menuToggle.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
+        });
+      </script>
 
 </body>
 
