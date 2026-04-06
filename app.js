@@ -68,7 +68,7 @@ app.use(
 // 🔑 PASSPORT
 // ======================
 
-app.use(passport.initialize());
+app.use(passport.initialize());``
 app.use(passport.session());
 
 // ======================
@@ -76,22 +76,17 @@ app.use(passport.session());
 // ======================
 
 app.use((req, res, next) => {
-  const isStaticFile = req.path.match(
-    /\.(css|js|png|jpg|jpeg|gif|svg)$/
-  );
+  const isStaticFile = req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg)$/);
 
   const needsAuthRoute =
     req.path.startsWith("/product/") ||
     req.path.startsWith("/cart") ||
-    req.path.startsWith("/payment/checkout");
+    req.path.startsWith("/checkout");
 
   if (!req.user && needsAuthRoute && !isStaticFile) {
     req.session.returnTo = req.originalUrl;
 
-    console.log(
-      "🔁 Saved redirect URL in session:",
-      req.originalUrl
-    );
+    console.log("🔁 Saved redirect URL:", req.originalUrl);
   }
 
   next();
