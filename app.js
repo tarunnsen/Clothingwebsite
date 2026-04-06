@@ -16,7 +16,7 @@ require("./config/google_auth");
 
 const app = express();
 
-// ✅ Trust proxy (important for deployment platforms like Render)
+// ✅ Trust proxy (IMPORTANT for Render / production)
 app.set("trust proxy", 1);
 
 // ======================
@@ -32,7 +32,6 @@ app.use(
   })
 );
 
-// ✅ Morgan (dev vs production)
 app.use(
   morgan(process.env.NODE_ENV === "production" ? "combined" : "dev")
 );
@@ -47,7 +46,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ======================
-// 🔐 SESSION CONFIG
+// 🔐 SESSION CONFIG (FIXED)
 // ======================
 
 app.use(
@@ -57,22 +56,22 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // important for HTTPS
-      sameSite: "lax", //  required for OAuth redirects
+      secure: true,        // 🔥 ALWAYS TRUE for production (Render HTTPS)
+      sameSite: "none",    // 🔥 CRITICAL FIX (OAuth ke liye)
       maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
 
 // ======================
-// 🔑 PASSPORT
+// 🔑 PASSPORT (FIXED)
 // ======================
 
-app.use(passport.initialize());``
+app.use(passport.initialize());
 app.use(passport.session());
 
 // ======================
-// 🔁 REDIRECT SAVE MIDDLEWARE
+// 🔁 AUTH REDIRECT MIDDLEWARE (CLEAN)
 // ======================
 
 app.use((req, res, next) => {
@@ -110,7 +109,7 @@ app.use("/payment", require("./routes/payment"));
 app.use("/order", require("./routes/order"));
 
 // ======================
-//  DEBUG ROUTES LIST (only in dev)
+//  DEBUG ROUTES (DEV ONLY)
 // ======================
 
 if (process.env.NODE_ENV !== "production") {
@@ -123,7 +122,7 @@ if (process.env.NODE_ENV !== "production") {
 // ======================
 
 app.use((err, req, res, next) => {
-  console.error(" Global Error:", err.stack);
+  console.error("Global Error:", err.stack);
   res.status(500).send("Something went wrong!");
 });
 
@@ -136,4 +135,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
