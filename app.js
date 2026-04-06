@@ -101,6 +101,7 @@ app.set("view engine", "ejs");
 // ======================
 
 app.use("/", require("./routes"));
+app.use("/cart", require("./routes/cart"));
 app.use("/auth", require("./routes/auth"));
 app.use("/users", require("./routes/user"));
 app.use("/admin", require("./routes/admin"));
